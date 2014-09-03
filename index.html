@@ -48,12 +48,13 @@ $(document).ready(function(){
 				$(".problems-list").empty();	// clears our list
 
 				$.getJSON(g_uHuntUserProblemsByIdUrl + userId, function( data ) {
-					var newData = data.subs.filter(isProblemACandNotInUDebug).map(function(e) { return e[1]; });
+					var newData = data.subs.filter(isProblemACandNotInUDebug).map(function(e) { return g_udata[e[1]]; });
 					var newData = newData.filter(function(value, index, self) { 
 						return self.indexOf(value) === index;
 					});	// filters out duplicates
+					newData = newData.sort(function(a, b){return a-b});
 					var items = newData.map(function( val, idx ) {
-						return "<li id='" + idx + "'>" + g_udata[val] + "</li>";
+						return "<li id='" + idx + "'>" + val + "</li>";
 					  });
 					  
 					  enableCorrectTitle(newData.length > 0);
