@@ -26,11 +26,18 @@ $(document).ready(function(){
 				  $.each( newData, function( key, val ) {
 					items.push( "<li id='" + key + "'>" + g_udata[val[1]] + "</li>" );
 				  });
-				  
-				  $( "<ul/>", {
-					"class": "my-new-list",
-					html: items.join( "" )
-				  }).appendTo( ".problems-list" );
+				  if (newData.length > 0)
+				  {
+					$(".text").html("List of problems you have solved that uDebug doesn't have:");
+					  $( "<ul/>", {
+						"class": "my-new-list",
+						html: items.join( "" )
+					  }).appendTo( ".problems-list" );
+				  }
+				  else
+				  {
+					  $(".text").html("Unfortunately the user you have entered has problems which are not on uDebug");
+				  }
 			});
 	    });
 	});
@@ -43,7 +50,7 @@ $(document).ready(function(){
 <input type="text" name="username"><br>
 <button>Compare</button>
 <div class="problems-result">
-<p>List of problems you have solved that uDebug doesn't have:</p>
+<p class="text">List of problems you have solved that uDebug doesn't have:</p>
 <div class="problems-list">
 	
 </div>
