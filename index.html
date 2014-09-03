@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+var g_data = {};
+var g_udata = {};
+$(document).ready(function(){
+  $.getJSON("http://www.udebug.com/api/UVa", function( data ) {
+	data.forEach(function(val, i) {
+		g_data[val] = data[i];
+	});
+  });
+  
+  $.getJSON("http://uhunt.felix-halim.net/api/p", function( data ) {
+	data.forEach(function(val, i) {
+		g_udata[val[0]] = val[1];
+	});
+  });
+  
+  $("button").click(function(){
+		$(".problems-list").html("");
+		$.getJSON( "http://uhunt.felix-halim.net/api/uname2uid/" + $("input").val(), function( data ) {		
+			$.getJSON( "http://uhunt.felix-halim.net/api/subs-user/" + data, function( data ) {
+				var items = [];
+				var newData = data.subs.filter(function(e) { return e[2] == 90 && g_data[g_udata[e[1]]] == null; });
+				  $.each( newData, function( key, val ) {
+					items.push( "<li id='" + key + "'>" + g_udata[val[1]] + "</li>" );
+				  });
+				  
+				  $( "<ul/>", {
+					"class": "my-new-list",
+					html: items.join( "" )
+				  }).appendTo( ".problems-list" );
+			});
+	    });
+	});
+});
+</script>
+<body>
+
+<h1>Compare your problems against uDebug</h1>
+<label for="enterLabel">Enter your username below: </label></br>
+<input type="text" name="username"><br>
+<button>Compare</button>
+<div class="problems-result">
+<p>List of problems you have solved that uDebug doesn't have:</p>
+<div class="problems-list">
+	
+</div>
+</div>
+</body>
+</html>
