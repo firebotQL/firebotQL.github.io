@@ -1,103 +1,111 @@
 <!DOCTYPE html>
 <html>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script>
-var g_uDebugProblemListUrl = "http://www.udebug.com/api/UVa";
-var g_uHuntProblemListUrl = "http://uhunt.felix-halim.net/api/p";
-var g_uHuntNameToIdUrl = "http://uhunt.felix-halim.net/api/uname2uid/";
-var g_uHuntUserProblemsByIdUrl = "http://uhunt.felix-halim.net/api/subs-user/";
-var g_data = {};
-var g_udata = {};
+<head>
+	<link rel="stylesheet" href="css/normalize.css">
+	<link href='http://fonts.googleapis.com/css?family=Bitter:400,400italic|PT+Serif:400,400italic' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/style.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script>
+	var g_uDebugProblemListUrl = "http://www.udebug.com/api/UVa";
+	var g_uHuntProblemListUrl = "http://uhunt.felix-halim.net/api/p";
+	var g_uHuntNameToIdUrl = "http://uhunt.felix-halim.net/api/uname2uid/";
+	var g_uHuntUserProblemsByIdUrl = "http://uhunt.felix-halim.net/api/subs-user/";
+	var g_data = {};
+	var g_udata = {};
 
-$(document).ready(function(){  
-  function enableCorrectTitle(enableExisting)
-  {
-	if (enableExisting)
-	{
-		$(".existingProblemTitle").show();
-		$(".nonExistingProblemTitle").hide();
-	}
-	else
-	{
-		$(".nonExistingProblemTitle").show();
-		$(".existingProblemTitle").hide();
-	}
-  }
-  
-  function isProblemACandNotInUDebug(element) { 
-	return element[2] == 90 && g_data[g_udata[element[1]]] == null; 
-	}
+	$(document).ready(function(){  
+	  function enableCorrectTitle(enableExisting)
+	  {
+		if (enableExisting)
+		{
+			$(".existingProblemTitle").show();
+			$(".nonExistingProblemTitle").hide();
+		}
+		else
+		{
+			$(".nonExistingProblemTitle").show();
+			$(".existingProblemTitle").hide();
+		}
+	  }
+	  
+	  function isProblemACandNotInUDebug(element) { 
+		return element[2] == 90 && g_data[g_udata[element[1]]] == null; 
+		}
 
-  $.getJSON(g_uDebugProblemListUrl, function( data ) {
-	data.forEach(function(val, i) {
-		g_data[val] = data[i];
+	  $.getJSON(g_uDebugProblemListUrl, function( data ) {
+		data.forEach(function(val, i) {
+			g_data[val] = data[i];
+		});
+	  });
+	  
+	  $.getJSON(g_uHuntProblemListUrl, function( data ) {
+		data.forEach(function(val, i) {
+			g_udata[val[0]] = val[1];
+		});
+	  });
+	  
+	  $("button").click(function(){
+			$.getJSON(g_uHuntNameToIdUrl + $("input").val(), function( userId ) {
+				if (userId != 0)
+				{
+					$(".nonExistingUser").hide();
+					$(".problems-list").empty();	// clears our list
+
+					$.getJSON(g_uHuntUserProblemsByIdUrl + userId, function( data ) {
+						var newData = data.subs.filter(isProblemACandNotInUDebug).map(function(e) { return g_udata[e[1]]; });
+						var newData = newData.filter(function(value, index, self) { 
+							return self.indexOf(value) === index;
+						});	// filters out duplicates
+						newData = newData.sort(function(a, b){return a-b});
+						var items = newData.map(function( val, idx ) {
+							return "<li id='" + idx + "'>" + val + "</li>";
+						  });
+						  
+						  enableCorrectTitle(newData.length > 0);
+						  
+						  $( "<ul/>", 
+						  {
+							"class": "my-new-list",
+							html: items.join( "" )
+						  }).appendTo( ".problems-list" );
+					});
+				}
+				else
+				{
+					$(".nonExistingUser").show();
+				}
+			});
+		});
+		
 	});
-  });
-  
-  $.getJSON(g_uHuntProblemListUrl, function( data ) {
-	data.forEach(function(val, i) {
-		g_udata[val[0]] = val[1];
-	});
-  });
-  
-  $("button").click(function(){
-		$.getJSON(g_uHuntNameToIdUrl + $("input").val(), function( userId ) {
-			if (userId != 0)
-			{
-				$(".nonExistingUser").hide();
-				$(".problems-list").empty();	// clears our list
+		
+	  // NOTE: this is only for private analytics of the website count
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-				$.getJSON(g_uHuntUserProblemsByIdUrl + userId, function( data ) {
-					var newData = data.subs.filter(isProblemACandNotInUDebug).map(function(e) { return g_udata[e[1]]; });
-					var newData = newData.filter(function(value, index, self) { 
-						return self.indexOf(value) === index;
-					});	// filters out duplicates
-					newData = newData.sort(function(a, b){return a-b});
-					var items = newData.map(function( val, idx ) {
-						return "<li id='" + idx + "'>" + val + "</li>";
-					  });
-					  
-					  enableCorrectTitle(newData.length > 0);
-					  
-					  $( "<ul/>", 
-					  {
-						"class": "my-new-list",
-						html: items.join( "" )
-					  }).appendTo( ".problems-list" );
-				});
-			}
-			else
-			{
-				$(".nonExistingUser").show();
-			}
-	    });
-	});
-	
-});
-	
-  // NOTE: this is only for private analytics of the website count
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-11101238-4', 'auto');
+	  ga('send', 'pageview');
 
-  ga('create', 'UA-11101238-4', 'auto');
-  ga('send', 'pageview');
-
-</script>
+	</script>
+</head>
 <body>
-
-<h1>Tool to check if user can contribute to uDebug</h1>
-<label for="enterLabel">Enter UVA username below: </label></br>
-<input type="text" name="username"><br>
-<p class="nonExistingUser" style="display : none; color: red;">User you have entered does not exist</p>
-<button>Check</button>
-<div class="problems-result">
-<p class="existingProblemTitle" style="display : none">List of solved problems for the entered user which he can contribute to uDebug:</p>
-<p class="nonExistingProblemTitle"  style="display : none">Unfortunately the user you have entered has no problems to contribute to uDebug</p>
-<div class="problems-list">
-	
-</div>
+<div class="box">
+	<h1>Can you contribute to uDebug?</h1>
+	<div class="centered">
+		<label for="enterLabel" >Enter UVA username below: </label></br>
+		<input type="text" name="username"><br>
+		<p class="nonExistingUser">User you have entered does not exist</p></br>
+		<button>Check</button>
+	</div>
+	<div class="problems-result">
+		<p class="existingProblemTitle">List of solved problems for the entered user which he can contribute to uDebug:</p>
+		<p class="nonExistingProblemTitle"  style="display : none">Unfortunately the user you have entered has no problems to contribute to uDebug</p>
+		<div class="problems-list">
+			
+		</div>
+	</div>
 </div>
 </body>
 </html>
