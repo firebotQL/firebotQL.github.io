@@ -1,0 +1,14 @@
+.problems-result {
+  display: none;
+}
+
+footer {
+  position: fixed;
+  padding-top: 10px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #f5f5f5;
+  text-align: center;
+  border: 1px solid #e3e3e3;
+}
