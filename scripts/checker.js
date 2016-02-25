@@ -1,7 +1,7 @@
 var g_uDebugProblemListUrl = "https://www.udebug.com/api/UVa";
-var g_uHuntProblemListUrl = "https://uhunt.felix-halim.net/api/p";
-var g_uHuntNameToIdUrl = "https://uhunt.felix-halim.net/api/uname2uid/";
-var g_uHuntUserProblemsByIdUrl = "https://uhunt.felix-halim.net/api/subs-user/";
+var g_uHuntProblemListUrl = "https://uhunt.onlinejudge.org/api/p";
+var g_uHuntNameToIdUrl = "https://uhunt.onlinejudge.org/api/uname2uid/";
+var g_uHuntUserProblemsByIdUrl = "https://uhunt.onlinejudge.org/api/subs-user/";
 var g_data = {};
 var g_udata = {};
 
